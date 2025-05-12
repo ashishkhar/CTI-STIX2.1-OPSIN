@@ -1,10 +1,8 @@
-![image](https://github.com/user-attachments/assets/54d3b1a1-5242-41a2-aafc-7e9f7179191a)# Enhanced STIX Visualizer
+ STIX Visualizer
 
 This project is an interactive web-based visualizer for STIX 2.x data. It allows users to upload STIX bundles (in JSON format), view the relationships between STIX objects as a graph, and explore the details of each object. The visualization is built using vis.js for graph rendering and provides an enhanced user interface for better interaction and data exploration.
 
-![STIX Visualizer Screenshot](stix_visualizer_screenshot.png)
-https://files09.oaiusercontent.com/file-UYkF66MsFGHxMmE9PUY1dp?se=2025-05-12T00%3A47%3A47Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D299%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D9f5f8c04-b10a-4510-8fc3-88f9e666fd41.png&sig=fjt56Si2A%2BI3z8vz8TgsbM4Qc2uytcpXdqORen%2BKnRs%3D![image](https://github.com/user-attachments/assets/565c4752-9911-4c8b-bb99-97bde8bb3e3c)
-
+![image](https://github.com/user-attachments/assets/54d3b1a1-5242-41a2-aafc-7e9f7179191a)# 
 
 ## Features
 
@@ -56,8 +54,6 @@ The application uses `require.js` for module loading. Key JavaScript files inclu
 *   `application.js`: Contains the main logic for the user interface, data handling, and visualization setup.
 *   `stix2viz/stix2viz/stix2viz.js`: The core STIX visualization library.
 *   `stix2viz/visjs/vis-network.min.js`: The vis.js graphing library.
-
-The icon directory is configured in `application.js` to `stix2viz/stix2viz/icons`.
 
 ## STIX Data Generation
 

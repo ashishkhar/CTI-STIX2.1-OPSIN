@@ -935,7 +935,7 @@ is not serving JSON, or is not running a webserver.\n\nA GitHub Gist can be crea
 
     // Add automatic loading of the specified JSON file
     // This will run during initialization
-    fetch('/bundle_2025_05_12_01_27.json')
+    fetch('bundle_2025_05_12_01_27.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

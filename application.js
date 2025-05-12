@@ -28,6 +28,11 @@ require(["domReady!", "stix2viz/stix2viz/stix2viz"], function (document, stix2vi
     let timelineVersions = null;
     let cumulativeIdGroups = null;
     let nonCumulativeIdGroups = null;
+    let stixData = null; // Store the full STIX data
+    let currentNodeDataSet = null;
+    let currentEdgeDataSet = null;
+    let currentStixIdToObject = null;
+    let currentSelectedNode = null;
 
     /**
      * Build a message and display an alert window, from an exception object.
@@ -138,6 +143,16 @@ require(["domReady!", "stix2viz/stix2viz/stix2viz"], function (document, stix2vi
         else
             customConfig = {};
 
+        // Store the full STIX data
+        try {
+            stixData = JSON.parse(content);
+        } catch (e) {
+            // If it's already an object, use it directly
+            if (typeof content === 'object') {
+                stixData = content;
+            }
+        }
+
         // Hard-coded working icon directory setting for this application.
         customConfig.iconDir = "stix2viz/stix2viz/icons";
 
@@ -147,6 +162,11 @@ require(["domReady!", "stix2viz/stix2viz/stix2viz"], function (document, stix2vi
         {
             let [nodeDataSet, edgeDataSet, stixIdToObject]
                 = stix2viz.makeGraphData(content, customConfig);
+
+            // Store for later use
+            currentNodeDataSet = nodeDataSet;
+            currentEdgeDataSet = edgeDataSet;
+            currentStixIdToObject = stixIdToObject;
 
             [
                 timelineVersions, cumulativeIdGroups, nonCumulativeIdGroups
@@ -186,6 +206,9 @@ require(["domReady!", "stix2viz/stix2viz/stix2viz"], function (document, stix2vi
 
             setupTimelineSlider(timelineVersions);
             populateLegend(...view.legendData);
+            
+            // Initialize the enhanced UI features
+            initEnhancedUI(nodeDataSet, edgeDataSet, stixIdToObject);
         }
         catch (err)
         {
@@ -874,9 +897,8 @@ is not serving JSON, or is not running a webserver.\n\nA GitHub Gist can be crea
           });
           linkifyHeader();
 
-        } else {
-          alert("ERROR: Invalid url - Request must start with '?url=http[s]://' and be a valid domain");
-        }
+        } 
+        
       }
     }
 
@@ -910,4 +932,1180 @@ is not serving JSON, or is not running a webserver.\n\nA GitHub Gist can be crea
     document.getElementById("timelineCheckbox").addEventListener("change", sliderChangeHandler, false);
 
     fetchJsonFromUrl();
+
+    // Add automatic loading of the specified JSON file
+    // This will run during initialization
+    fetch('/bundle_2025_05_12_01_27.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("JSON loaded automatically");
+            document.getElementById("uploader").style.display = "none";
+            document.getElementById("canvas-container").classList.remove("hidden");
+            document.getElementById("bottom-panel").classList.add("expanded"); // Ensure bottom panel is shown
+            vizStixWrapper(data, null);
+        })
+        .catch(error => {
+            console.error('Error loading JSON:', error);
+            // If there's an error, don't hide the uploader
+            if (showToast) {
+                showToast('error', 'Error Loading Data', error.message);
+            } else {
+                alert('Error loading JSON file. You can upload your own STIX data instead.');
+            }
+        });
+
+    // Add event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handler for file select
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+        document.getElementById('paste-parser').addEventListener('click', handleTextarea, false);
+        document.getElementById('fetch-url').addEventListener('click', handleFetchJson, false);
+        // Setup the drag and drop listeners
+        let dropZone = document.getElementById('uploader');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileDrop, false);
+        document.getElementById('legend').addEventListener('click', legendClickHandler, false);
+        document.getElementById('selected').addEventListener('click', selectedNodeClick, false);
+        document.getElementById('timeline').addEventListener('change', sliderChangeHandler, false);
+        document.getElementById('timelineCheckbox').addEventListener('change', setVisibilityForTimeline, false);
+        linkifyHeader();
+    });
+
+    /**
+     * Initialize the enhanced UI features
+     */
+    function initEnhancedUI(nodeDataSet, edgeDataSet, stixIdToObject) {
+        // Initialize bottom panel tabs
+        initTabSystem();
+        
+        // Populate data tables
+        populateDataTables(stixData);
+        
+        // Setup toolbar buttons
+        initToolbarButtons(nodeDataSet, edgeDataSet, stixIdToObject);
+        
+        // Setup node search
+        initNodeSearch(nodeDataSet);
+        
+        // Setup modals
+        initModals();
+
+        // Initialize upload zone
+        initUploadZone();
+
+        // Initialize IOC filtering
+        initIOCFiltering();
+
+        // Initialize toast notifications system
+        initToastSystem();
+        
+        // Initialize tab control buttons
+        initTabControls();
+        
+        // Activate the first tab by default
+        const firstTab = document.querySelector('.tab');
+        if (firstTab) {
+            firstTab.click();
+        }
+        
+        // Adjust the layout for the fixed split view
+        adjustSplitViewLayout();
+        
+        // Add resize event listener to handle window resizing
+        window.addEventListener('resize', adjustSplitViewLayout);
+        
+        // Show welcome toast
+        showToast('success', 'Visualization Ready', 'STIX data loaded successfully. Click on nodes to explore.');
+    }
+    
+    /**
+     * Initialize the tab system in the bottom panel
+     */
+    function initTabSystem() {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                // Show the corresponding tab content
+                const targetTab = tab.getAttribute('data-tab');
+                document.getElementById(`${targetTab}-tab`).classList.add('active');
+                
+                // Make sure the tab content height is correct
+                adjustTabContentHeight();
+            });
+        });
+        
+        // Initialize data view tabs if they exist
+        document.querySelectorAll('.data-view-tab').forEach(dataTab => {
+            dataTab.addEventListener('click', () => {
+                const tabGroup = dataTab.closest('.data-view-tabs');
+                if (!tabGroup) return;
+                
+                // Remove active class from all tabs in this group
+                tabGroup.querySelectorAll('.data-view-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                dataTab.classList.add('active');
+                
+                // Get the target data view
+                const targetView = dataTab.getAttribute('data-view');
+                if (!targetView) return;
+                
+                // Hide all content related to this tab group
+                const tabContents = tabGroup.nextElementSibling;
+                if (tabContents && tabContents.classList.contains('data-view-contents')) {
+                    tabContents.querySelectorAll('.data-view-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Show the target content
+                    const targetContent = tabContents.querySelector(`.data-view-content[data-view="${targetView}"]`);
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                    }
+                }
+            });
+        });
+    }
+    
+    /**
+     * Adjust the layout for the fixed split view
+     */
+    function adjustSplitViewLayout() {
+        const headerHeight = document.getElementById('top-header-bar').offsetHeight;
+        const windowHeight = window.innerHeight;
+        const canvasHeight = windowHeight * 0.4; // 40% of window height
+        
+        // Adjust the canvas container height
+        const canvasContainer = document.getElementById('canvas-container');
+        canvasContainer.style.height = `${canvasHeight}px`;
+        canvasContainer.style.top = `${headerHeight}px`;
+        
+        // Adjust the bottom panel position and height
+        const bottomPanel = document.getElementById('bottom-panel');
+        bottomPanel.style.top = `${canvasHeight + headerHeight}px`;
+        bottomPanel.style.height = `${windowHeight - canvasHeight - headerHeight}px`;
+        
+        // Adjust tab content height
+        adjustTabContentHeight();
+        
+        // If we have a view, refresh it
+        if (view && typeof view.redraw === 'function') {
+            view.redraw();
+        }
+    }
+    
+    /**
+     * Adjust the height of tab content based on the window size
+     */
+    function adjustTabContentHeight() {
+        const headerHeight = document.getElementById('top-header-bar').offsetHeight;
+        const windowHeight = window.innerHeight;
+        const canvasHeight = windowHeight * 0.4; // 40% of window height
+        const tabContainerHeight = document.querySelector('.tab-container').offsetHeight;
+        
+        // Set the height for the main data section to allow proper scrolling
+        const mainDataSection = document.querySelector('.main-data-section');
+        if (mainDataSection) {
+            mainDataSection.style.maxHeight = `${windowHeight - canvasHeight - headerHeight}px`;
+        }
+        
+        // Allow tab content to use available space
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.style.maxHeight = `${windowHeight - canvasHeight - headerHeight - tabContainerHeight}px`;
+        });
+        
+        // Ensure details view has proper height
+        const detailsView = document.getElementById('details-view');
+        if (detailsView) {
+            detailsView.style.maxHeight = `${windowHeight - canvasHeight - headerHeight - tabContainerHeight}px`;
+        }
+        
+        // Set height for the details panels
+        const detailsPanels = document.querySelector('.details-panels');
+        if (detailsPanels) {
+            detailsPanels.style.height = `${windowHeight - canvasHeight - headerHeight - tabContainerHeight}px`;
+        }
+    }
+    
+    /**
+     * Initialize tab control buttons
+     */
+    function initTabControls() {
+        // Toggle view mode button (data view / details view)
+        const toggleViewModeBtn = document.getElementById('toggle-view-mode');
+        if (toggleViewModeBtn) {
+            let detailsViewActive = false;
+            
+            toggleViewModeBtn.addEventListener('click', () => {
+                const dataView = document.getElementById('data-view');
+                const detailsView = document.getElementById('details-view');
+                
+                if (detailsViewActive) {
+                    // Switch to data view
+                    dataView.classList.add('active');
+                    detailsView.classList.remove('active');
+                    toggleViewModeBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
+                    toggleViewModeBtn.title = 'Switch to details view';
+                    toggleViewModeBtn.classList.remove('active');
+                    
+                    showToast('info', 'Data View', 'Showing data tables view');
+                } else {
+                    // Switch to details view
+                    dataView.classList.remove('active');
+                    detailsView.classList.add('active');
+                    toggleViewModeBtn.innerHTML = '<i class="fas fa-table"></i>';
+                    toggleViewModeBtn.title = 'Switch to data view';
+                    toggleViewModeBtn.classList.add('active');
+                    
+                    showToast('info', 'Details View', 'Showing details panels view');
+                }
+                
+                detailsViewActive = !detailsViewActive;
+                
+                // Adjust layout
+                adjustSplitViewLayout();
+            });
+        }
+        
+        // Toggle canvas size button
+        const toggleCanvasSizeBtn = document.getElementById('toggle-canvas-size');
+        if (toggleCanvasSizeBtn) {
+            let canvasExpanded = false;
+            
+            toggleCanvasSizeBtn.addEventListener('click', () => {
+                const canvasContainer = document.getElementById('canvas-container');
+                const bottomPanel = document.getElementById('bottom-panel');
+                const headerHeight = document.getElementById('top-header-bar').offsetHeight;
+                const windowHeight = window.innerHeight;
+                
+                if (canvasExpanded) {
+                    // Return to default 40/60 split
+                    canvasContainer.style.height = `${windowHeight * 0.4}px`;
+                    bottomPanel.style.top = `${windowHeight * 0.4 + headerHeight}px`;
+                    bottomPanel.style.height = `${windowHeight - (windowHeight * 0.4) - headerHeight}px`;
+                    toggleCanvasSizeBtn.innerHTML = '<i class="fas fa-expand-alt"></i>';
+                    toggleCanvasSizeBtn.setAttribute('title', 'Expand canvas');
+                } else {
+                    // Expand canvas to 70%
+                    canvasContainer.style.height = `${windowHeight * 0.7}px`;
+                    bottomPanel.style.top = `${windowHeight * 0.7 + headerHeight}px`;
+                    bottomPanel.style.height = `${windowHeight - (windowHeight * 0.7) - headerHeight}px`;
+                    toggleCanvasSizeBtn.innerHTML = '<i class="fas fa-compress-alt"></i>';
+                    toggleCanvasSizeBtn.setAttribute('title', 'Shrink canvas');
+                }
+                
+                canvasExpanded = !canvasExpanded;
+                
+                // Adjust content heights
+                adjustTabContentHeight();
+                
+                // Show notification
+                showToast('info', canvasExpanded ? 'Canvas Expanded' : 'Canvas Default', 
+                    canvasExpanded ? 'Graph view expanded to 70% of the screen' : 'Graph view returned to default size');
+                
+                // Redraw the graph if needed
+                if (view && typeof view.redraw === 'function') {
+                    view.redraw();
+                }
+            });
+        }
+    }
+    
+    /**
+     * Show a selected node in the details panel
+     */
+    function viewObject(obj) {
+        // Find the node in the graph
+        if (view && obj.id) {
+            view.selectNode(obj.id);
+            
+            // Convert the object to a Map for the existing code
+            const objMap = new Map();
+            Object.entries(obj).forEach(([key, value]) => {
+                objMap.set(key, value);
+            });
+            
+            populateSelected(objMap, currentEdgeDataSet, currentStixIdToObject);
+            
+            // Switch to details view if we're not already there
+            const dataView = document.getElementById('data-view');
+            const detailsView = document.getElementById('details-view');
+            const toggleViewModeBtn = document.getElementById('toggle-view-mode');
+            
+            if (dataView.classList.contains('active')) {
+                // Switch to details view
+                dataView.classList.remove('active');
+                detailsView.classList.add('active');
+                
+                if (toggleViewModeBtn) {
+                    toggleViewModeBtn.innerHTML = '<i class="fas fa-table"></i>';
+                    toggleViewModeBtn.title = 'Switch to data view';
+                    toggleViewModeBtn.classList.add('active');
+                }
+            }
+            
+            // Scroll the selected panel into view in the bottom panel
+            const selectedPanel = document.getElementById('selected');
+            selectedPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+    
+    /**
+     * Open the edit modal for a STIX object
+     */
+    function openEditModal(obj) {
+        const modal = document.getElementById('edit-modal');
+        const editor = document.getElementById('json-editor');
+        
+        // Set the editor content
+        editor.value = JSON.stringify(obj, null, 2);
+        
+        // Show the modal
+        modal.style.display = 'block';
+        
+        // Store the object ID for later use
+        editor.setAttribute('data-id', obj.id);
+    }
+    
+    /**
+     * Initialize the toolbar buttons
+     */
+    function initToolbarButtons(nodeDataSet, edgeDataSet, stixIdToObject) {
+        // Edit selected node button
+        document.getElementById('edit-selected-btn').addEventListener('click', () => {
+            if (currentSelectedNode) {
+                const nodeEditor = document.getElementById('node-editor');
+                const nodeEditContainer = document.getElementById('node-edit-container');
+                
+                // Convert Map to object for editing
+                const nodeObj = {};
+                currentSelectedNode.forEach((value, key) => {
+                    nodeObj[key] = value;
+                });
+                
+                // Format the JSON with proper indentation for better editing
+                nodeEditor.value = JSON.stringify(nodeObj, null, 2);
+                
+                // Show the editor
+                nodeEditContainer.style.display = 'block';
+                
+                // Make sure the sidebar content is visible
+                const selectedPanel = document.getElementById('selected');
+                const contentArea = selectedPanel.querySelector('.sidebar-content');
+                if (contentArea) {
+                    contentArea.style.display = 'block';
+                }
+                
+                // Focus on the editor
+                nodeEditor.focus();
+                
+                // Scroll to the selected panel
+                selectedPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Add syntax highlighting if possible
+                try {
+                    // Apply simple syntax highlighting if available
+                    nodeEditor.style.color = 'var(--primary-color)';
+                } catch (e) {
+                    console.log('Simple syntax highlighting not applied');
+                }
+            } else {
+                showToast('warning', 'No Node Selected', 'Please select a node to edit');
+            }
+        });
+        
+        // Show all data button
+        document.getElementById('show-all-data-btn').addEventListener('click', () => {
+            // Switch to data view if needed
+            const dataView = document.getElementById('data-view');
+            const detailsView = document.getElementById('details-view');
+            const toggleViewModeBtn = document.getElementById('toggle-view-mode');
+            
+            if (!dataView.classList.contains('active')) {
+                // Switch to data view
+                dataView.classList.add('active');
+                detailsView.classList.remove('active');
+                
+                if (toggleViewModeBtn) {
+                    toggleViewModeBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
+                    toggleViewModeBtn.title = 'Switch to details view';
+                    toggleViewModeBtn.classList.remove('active');
+                }
+            }
+            
+            // Activate the 'all' tab
+            const allTab = document.querySelector('.tab[data-tab="all"]');
+            if (allTab) {
+                allTab.click();
+            }
+            
+            // Scroll the main data section into view
+            const mainDataSection = document.querySelector('.main-data-section');
+            if (mainDataSection) {
+                mainDataSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            showToast('info', 'Data View', 'Showing all STIX objects');
+        });
+        
+        // Export button
+        document.getElementById('export-btn').addEventListener('click', () => {
+            if (stixData) {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(stixData, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "stix-export.json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+                
+                // Show success toast
+                showToast('success', 'Export Complete', 'STIX data exported successfully');
+            }
+        });
+        
+        // Re-layout button
+        document.getElementById('layout-btn').addEventListener('click', () => {
+            if (view) {
+                view.stabilize();
+                showToast('info', 'Layout Refreshed', 'Graph layout has been recalculated');
+            }
+        });
+        
+        // Reset view button
+        document.getElementById('reset-view-btn').addEventListener('click', () => {
+            if (view) {
+                view.resetView();
+                showToast('info', 'View Reset', 'Graph view has been reset to default');
+            }
+        });
+        
+        // Save node button
+        document.getElementById('save-node-btn').addEventListener('click', () => {
+            saveNodeChanges();
+        });
+        
+        // Cancel edit button
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            document.getElementById('node-edit-container').style.display = 'none';
+        });
+        
+        // Save edit button in modal
+        document.getElementById('save-edit-btn').addEventListener('click', () => {
+            saveModalChanges();
+        });
+        
+        // Cancel modal button
+        document.getElementById('cancel-modal-btn').addEventListener('click', () => {
+            document.getElementById('edit-modal').style.display = 'none';
+        });
+    }
+    
+    /**
+     * Save changes to a node from the sidebar editor
+     */
+    function saveNodeChanges() {
+        try {
+            const nodeEditor = document.getElementById('node-editor');
+            const editedNode = JSON.parse(nodeEditor.value);
+            
+            if (!editedNode.id) {
+                alert('Node must have an ID');
+                return;
+            }
+            
+            // Update the node in the visualization
+            updateNodeInVisualization(editedNode);
+            
+            // Hide the editor
+            document.getElementById('node-edit-container').style.display = 'none';
+            
+            // Update the STIX data
+            updateStixData(editedNode);
+            
+            // Update the data tables
+            populateDataTables(stixData);
+        } catch (e) {
+            alert('Error saving changes: ' + e.message);
+        }
+    }
+    
+    /**
+     * Save changes from the edit modal
+     */
+    function saveModalChanges() {
+        try {
+            const editor = document.getElementById('json-editor');
+            const editedObj = JSON.parse(editor.value);
+            
+            if (!editedObj.id) {
+                alert('Object must have an ID');
+                return;
+            }
+            
+            // Update the node in the visualization if it exists
+            updateNodeInVisualization(editedObj);
+            
+            // Update the STIX data
+            updateStixData(editedObj);
+            
+            // Update the data tables
+            populateDataTables(stixData);
+            
+            // Hide the modal
+            document.getElementById('edit-modal').style.display = 'none';
+        } catch (e) {
+            alert('Error saving changes: ' + e.message);
+        }
+    }
+    
+    /**
+     * Update a node in the visualization
+     */
+    function updateNodeInVisualization(objData) {
+        if (!view || !currentNodeDataSet) return;
+        
+        // Check if the node exists in the visualization
+        const nodeExists = currentNodeDataSet.get(objData.id);
+        
+        if (nodeExists) {
+            // Update the node
+            const updatedNode = {
+                id: objData.id,
+                title: objData.name || objData.value || extractPatternValue(objData.pattern) || objData.id,
+                label: objData.name || objData.value || extractPatternValue(objData.pattern) || objData.id.split('--')[0]
+            };
+            
+            currentNodeDataSet.update(updatedNode);
+            
+            // Update the Map in stixIdToObject
+            if (currentStixIdToObject.has(objData.id)) {
+                const objMap = new Map();
+                Object.entries(objData).forEach(([key, value]) => {
+                    objMap.set(key, value);
+                });
+                currentStixIdToObject.set(objData.id, objMap);
+                
+                // If this is the currently selected node, update the display
+                if (currentSelectedNode && currentSelectedNode.get('id') === objData.id) {
+                    populateSelected(objMap, currentEdgeDataSet, currentStixIdToObject);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Update the STIX data with edited object
+     */
+    function updateStixData(objData) {
+        if (!stixData || !stixData.objects) return;
+        
+        // Find the object in the STIX data
+        const index = stixData.objects.findIndex(obj => obj.id === objData.id);
+        
+        if (index !== -1) {
+            // Update the object
+            stixData.objects[index] = objData;
+        } else {
+            // Add the object
+            stixData.objects.push(objData);
+        }
+    }
+    
+    /**
+     * Initialize the node search functionality
+     */
+    function initNodeSearch(nodeDataSet) {
+        const searchInput = document.getElementById('node-search');
+        
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            if (!view || !nodeDataSet) return;
+            
+            if (searchTerm.trim() === '') {
+                // Reset highlighting
+                nodeDataSet.forEach(node => {
+                    node.color = undefined;
+                    nodeDataSet.update(node);
+                });
+                return;
+            }
+            
+            // Highlight matching nodes
+            nodeDataSet.forEach(node => {
+                const nodeLabel = node.label.toLowerCase();
+                const nodeTitle = (node.title || '').toLowerCase();
+                
+                if (nodeLabel.includes(searchTerm) || nodeTitle.includes(searchTerm)) {
+                    // Highlight the node
+                    node.color = {
+                        background: '#ffff00',
+                        border: '#ffa500'
+                    };
+                } else {
+                    // Reset the node color
+                    node.color = undefined;
+                }
+                
+                nodeDataSet.update(node);
+            });
+        });
+    }
+    
+    /**
+     * Initialize the modals
+     */
+    function initModals() {
+        // Close buttons for modals
+        document.querySelectorAll('.close-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Find the parent modal
+                const modal = btn.closest('.modal');
+                modal.style.display = 'none';
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+    }
+    
+    /**
+     * Initialize the upload zone with drag and drop
+     */
+    function initUploadZone() {
+        const dropZone = document.getElementById('drop-zone');
+        
+        if (!dropZone) return;
+
+        // Set up drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('drag-over');
+        }
+
+        // Handle drops
+        dropZone.addEventListener('drop', handleFileDrop, false);
+
+        // Make the drop zone click to upload
+        dropZone.addEventListener('click', () => {
+            document.getElementById('files').click();
+        });
+    }
+
+    /**
+     * Initialize IOC filtering functionality
+     */
+    function initIOCFiltering() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('ioc-search');
+        
+        if (!filterButtons.length || !searchInput) return;
+
+        // Filter buttons
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Apply filter
+                const filter = btn.getAttribute('data-filter');
+                filterIOCTable(filter, searchInput.value);
+            });
+        });
+
+        // Search input
+        searchInput.addEventListener('input', () => {
+            const activeFilter = document.querySelector('.filter-btn.active');
+            const filter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+            filterIOCTable(filter, searchInput.value);
+        });
+    }
+
+    /**
+     * Filter the IOC table based on type and search term
+     */
+    function filterIOCTable(typeFilter, searchTerm) {
+        const rows = document.querySelectorAll('#ioc-summary-table tbody tr');
+        
+        rows.forEach(row => {
+            const typeCol = row.querySelector('td:first-child').textContent.toLowerCase();
+            const valueCol = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            
+            // Check if it matches the type filter
+            const matchesType = typeFilter === 'all' || 
+                                (typeFilter === 'ip' && (typeCol.includes('ipv4') || typeCol.includes('ipv6'))) ||
+                                (typeFilter === 'domain' && typeCol.includes('domain')) ||
+                                (typeFilter === 'url' && typeCol.includes('url')) ||
+                                (typeFilter === 'hash' && typeCol.includes('hash'));
+            
+            // Check if it matches the search term
+            const matchesSearch = !searchTerm || 
+                                 valueCol.includes(searchTerm.toLowerCase()) ||
+                                 typeCol.includes(searchTerm.toLowerCase());
+            
+            // Show/hide the row
+            row.style.display = matchesType && matchesSearch ? '' : 'none';
+        });
+    }
+
+    /**
+     * Initialize toast notification system
+     */
+    function initToastSystem() {
+        // Create container if it doesn't exist
+        if (!document.getElementById('toast-container')) {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            document.body.appendChild(container);
+        }
+    }
+
+    /**
+     * Show a toast notification
+     * @param {string} type - success, error, warning, or info
+     * @param {string} title - Title of the notification
+     * @param {string} message - Message content
+     * @param {number} duration - Duration in milliseconds
+     */
+    function showToast(type, title, message, duration = 4000) {
+        const container = document.getElementById('toast-container');
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        // Set icon based on type
+        let icon = 'info-circle';
+        if (type === 'success') icon = 'check-circle';
+        if (type === 'error') icon = 'times-circle';
+        if (type === 'warning') icon = 'exclamation-triangle';
+        
+        // Create toast content
+        toast.innerHTML = `
+            <div class="toast-icon"><i class="fas fa-${icon}"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <div class="toast-close"><i class="fas fa-times"></i></div>
+        `;
+        
+        // Add to container
+        container.appendChild(toast);
+        
+        // Add close handler
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            toast.remove();
+        });
+        
+        // Auto remove after duration
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    /**
+     * Override handleFiles to show success notification
+     */
+    const originalHandleFiles = handleFiles;
+    handleFiles = function(files) {
+        originalHandleFiles(files);
+        
+        // Display success notification
+        if (files && files.length) {
+            setTimeout(() => {
+                showToast('success', 'File Loaded', `Successfully loaded ${files[0].name}`);
+            }, 1000);
+        }
+    };
+
+    /**
+     * Override handleTextarea to show success notification
+     */
+    const originalHandleTextarea = handleTextarea;
+    handleTextarea = function() {
+        originalHandleTextarea();
+        
+        // Display success notification
+        setTimeout(() => {
+            showToast('success', 'Data Parsed', 'Successfully loaded pasted STIX data');
+        }, 1000);
+    };
+
+    /**
+     * Override handleFetchJson to show notifications
+     */
+    const originalHandleFetchJson = handleFetchJson;
+    handleFetchJson = function() {
+        const url = document.getElementById("url").value;
+        
+        // Show loading toast
+        showToast('info', 'Fetching Data', `Loading STIX data from ${url}...`, 2000);
+        
+        // Call original function
+        originalHandleFetchJson();
+    };
+
+    /**
+     * Override the saveNodeChanges function to show success notification
+     */
+    const originalSaveNodeChanges = saveNodeChanges;
+    saveNodeChanges = function() {
+        try {
+            originalSaveNodeChanges();
+            
+            // Show success notification
+            showToast('success', 'Node Updated', 'Successfully saved node changes');
+        } catch (e) {
+            // Show error notification
+            showToast('error', 'Error Saving Node', e.message);
+            throw e;
+        }
+    };
+
+    /**
+     * Override the saveModalChanges function to show success notification
+     */
+    const originalSaveModalChanges = saveModalChanges;
+    saveModalChanges = function() {
+        try {
+            originalSaveModalChanges();
+            
+            // Show success notification
+            showToast('success', 'Object Updated', 'Successfully saved object changes');
+        } catch (e) {
+            // Show error notification
+            showToast('error', 'Error Saving Object', e.message);
+            throw e;
+        }
+    };
+
+    /**
+     * Update the visualization functions to be more user-friendly
+     */
+    const originalPopulateDataTables = populateDataTables;
+    populateDataTables = function(stixData) {
+        // Show loading spinner
+        document.querySelectorAll('.data-table tbody').forEach(tbody => {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem;">
+                        <span class="spinner spinner-dark"></span> Loading data...
+                    </td>
+                </tr>
+            `;
+        });
+        
+        // Call original function with a slight delay to show the spinner
+        setTimeout(() => {
+            originalPopulateDataTables(stixData);
+        }, 300);
+    };
+
+    /**
+     * Extract pattern value from STIX pattern
+     */
+    function extractPatternValue(pattern) {
+        if (!pattern) return '';
+        
+        // Handle common pattern types
+        if (pattern.includes('ipv4-addr:value')) {
+            const match = pattern.match(/ipv4-addr:value\s*=\s*'([^']+)'/);
+            return match ? match[1] : pattern;
+        } else if (pattern.includes('domain-name:value')) {
+            const match = pattern.match(/domain-name:value\s*=\s*'([^']+)'/);
+            return match ? match[1] : pattern;
+        } else if (pattern.includes('url:value')) {
+            const match = pattern.match(/url:value\s*=\s*'([^']+)'/);
+            return match ? match[1] : pattern;
+        } else if (pattern.includes('file:hashes.MD5')) {
+            const match = pattern.match(/file:hashes\.[^:]+\s*=\s*'([^']+)'/);
+            return match ? match[1] : pattern;
+        } else {
+            // Return a shortened version for other patterns
+            return pattern.length > 50 ? pattern.substring(0, 47) + '...' : pattern;
+        }
+    }
+    
+    /**
+     * Determine the pattern type from a STIX pattern
+     */
+    function determinePatternType(pattern) {
+        if (!pattern) return 'Unknown';
+        
+        if (pattern.includes('ipv4-addr:value')) {
+            return 'IPv4';
+        } else if (pattern.includes('ipv6-addr:value')) {
+            return 'IPv6';
+        } else if (pattern.includes('domain-name:value')) {
+            return 'Domain';
+        } else if (pattern.includes('url:value')) {
+            return 'URL';
+        } else if (pattern.includes('file:hashes.MD5')) {
+            return 'MD5 Hash';
+        } else if (pattern.includes('file:hashes.SHA-1')) {
+            return 'SHA-1 Hash';
+        } else if (pattern.includes('file:hashes.SHA-256')) {
+            return 'SHA-256 Hash';
+        } else if (pattern.includes('email-addr:value')) {
+            return 'Email';
+        } else {
+            return 'Other';
+        }
+    }
+    
+    /**
+     * Get a display name for a STIX object
+     */
+    function getDisplayName(obj) {
+        if (!obj) return 'Unknown';
+        
+        if (obj.name) {
+            return obj.name;
+        } else if (obj.value) {
+            return obj.value;
+        } else if (obj.pattern) {
+            return extractPatternValue(obj.pattern);
+        } else if (obj.relationship_type) {
+            return obj.relationship_type;
+        } else if (obj.id) {
+            return obj.id.split('--')[0];
+        } else {
+            return 'Unnamed';
+        }
+    }
+    
+    /**
+     * Format a date string for display
+     */
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        } catch (e) {
+            return dateString;
+        }
+    }
+    
+    /**
+     * Populate the data tables with STIX objects
+     */
+    function populateDataTables(stixData) {
+        if (!stixData || !stixData.objects) return;
+        
+        const objects = stixData.objects;
+        
+        // Clear existing table content
+        document.getElementById('indicators-body').innerHTML = '';
+        document.getElementById('threat-actors-body').innerHTML = '';
+        document.getElementById('malware-body').innerHTML = '';
+        document.getElementById('attack-patterns-body').innerHTML = '';
+        document.getElementById('relationships-body').innerHTML = '';
+        document.getElementById('all-objects-body').innerHTML = '';
+        document.getElementById('ioc-summary-body').innerHTML = '';
+        
+        // Group objects by type
+        const indicators = [];
+        const threatActors = [];
+        const malware = [];
+        const attackPatterns = [];
+        const relationships = [];
+        
+        objects.forEach(obj => {
+            // Add to the all objects table
+            const allRow = document.createElement('tr');
+            allRow.innerHTML = `
+                <td>${obj.type}</td>
+                <td>${obj.id}</td>
+                <td>${getDisplayName(obj)}</td>
+                <td>${formatDate(obj.created)}</td>
+                <td>${formatDate(obj.modified)}</td>
+                <td>
+                    <button class="view-btn" data-id="${obj.id}">View</button>
+                    <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                </td>
+            `;
+            document.getElementById('all-objects-body').appendChild(allRow);
+            
+            // Add to specific type tables
+            if (obj.type === 'indicator') {
+                indicators.push(obj);
+                
+                const indicatorRow = document.createElement('tr');
+                indicatorRow.innerHTML = `
+                    <td>${obj.name || 'Unnamed'}</td>
+                    <td>${determinePatternType(obj.pattern)}</td>
+                    <td class="indicator-value">${extractPatternValue(obj.pattern)}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('indicators-body').appendChild(indicatorRow);
+                
+                // Also add to the IOC summary
+                const iocRow = document.createElement('tr');
+                iocRow.innerHTML = `
+                    <td>${determinePatternType(obj.pattern)}</td>
+                    <td class="indicator-value">${extractPatternValue(obj.pattern)}</td>
+                    <td>${obj.pattern_type || 'stix'}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('ioc-summary-body').appendChild(iocRow);
+            } else if (obj.type === 'threat-actor') {
+                threatActors.push(obj);
+                
+                const actorRow = document.createElement('tr');
+                actorRow.innerHTML = `
+                    <td>${obj.name || 'Unnamed'}</td>
+                    <td>${obj.description || ''}</td>
+                    <td>${obj.identity_class || ''}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('threat-actors-body').appendChild(actorRow);
+            } else if (obj.type === 'malware') {
+                malware.push(obj);
+                
+                const malwareRow = document.createElement('tr');
+                malwareRow.innerHTML = `
+                    <td>${obj.name || 'Unnamed'}</td>
+                    <td>${obj.description || ''}</td>
+                    <td>${Array.isArray(obj.malware_types) ? obj.malware_types.join(', ') : ''}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('malware-body').appendChild(malwareRow);
+            } else if (obj.type === 'attack-pattern') {
+                attackPatterns.push(obj);
+                
+                let killChainPhases = '';
+                if (obj.kill_chain_phases && Array.isArray(obj.kill_chain_phases)) {
+                    killChainPhases = obj.kill_chain_phases.map(kc => `${kc.kill_chain_name}: ${kc.phase_name}`).join(', ');
+                }
+                
+                const attackRow = document.createElement('tr');
+                attackRow.innerHTML = `
+                    <td>${obj.name || 'Unnamed'}</td>
+                    <td>${obj.description || ''}</td>
+                    <td>${killChainPhases}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('attack-patterns-body').appendChild(attackRow);
+            } else if (obj.type === 'relationship') {
+                relationships.push(obj);
+                
+                // Find source and target objects
+                const sourceObj = objects.find(o => o.id === obj.source_ref);
+                const targetObj = objects.find(o => o.id === obj.target_ref);
+                
+                const relRow = document.createElement('tr');
+                relRow.innerHTML = `
+                    <td>${sourceObj ? getDisplayName(sourceObj) : obj.source_ref}</td>
+                    <td>${obj.relationship_type}</td>
+                    <td>${targetObj ? getDisplayName(targetObj) : obj.target_ref}</td>
+                    <td>${formatDate(obj.created)}</td>
+                    <td>${formatDate(obj.modified)}</td>
+                    <td>
+                        <button class="view-btn" data-id="${obj.id}">View</button>
+                        <button class="edit-btn" data-id="${obj.id}">Edit</button>
+                    </td>
+                `;
+                document.getElementById('relationships-body').appendChild(relRow);
+            }
+        });
+        
+        // Add event listeners to the view and edit buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const obj = objects.find(o => o.id === id);
+                if (obj) {
+                    viewObject(obj);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const obj = objects.find(o => o.id === id);
+                if (obj) {
+                    openEditModal(obj);
+                }
+            });
+        });
+    }
+    
+    /**
+     * Override the populateSelected function to store the current selected node
+     */
+    const originalPopulateSelected = populateSelected;
+    populateSelected = function(stixObject, edgeDataSet, stixIdToObject) {
+        // Store the current selected node
+        currentSelectedNode = stixObject;
+        
+        // Call the original function
+        originalPopulateSelected(stixObject, edgeDataSet, stixIdToObject);
+    };
 });

@@ -1,0 +1,613 @@
+{
+    "type": "bundle",
+    "id": "bundle--ba814149-7dae-4a40-9799-b286add38d72",
+    "objects": [
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--df4352f4-dc56-4d37-af11-0adbcd3ce114",
+            "name": "Keymous+",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group active in DDoS attacks targeting Indian public healthcare infrastructure and municipal corporations, part of the KMP Group.",
+            "aliases": [
+                "Keymous+"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--f6b745db-8e91-4bc8-b8a6-3f9b40d24a13",
+            "name": "AnonSec",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Decentralized international hacktivist group known for cyberattacks against governments and institutions, motivated by anti-censorship and social justice, active in DDoS and website defacements targeting Indian government portals.",
+            "aliases": [
+                "AnonSec"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--80d98979-65a3-4bc6-9eea-7cad237ac84c",
+            "name": "Electronic Army Special Forces",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group targeting Indian national defense, justice, and cybersecurity portals using DDoS, defacement, and data breach tactics.",
+            "aliases": [
+                "Electronic Army Special Forces"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--e54f3c58-2a19-491c-a819-8f943dc28045",
+            "name": "Nation of Saviors",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Most active pro-Pakistani hacktivist group during the cyber escalation, conducting DDoS attacks against Indian state infrastructure including defense, law enforcement, education, and e-governance agencies.",
+            "aliases": [
+                "Nation of Saviors"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--2842bc29-dde8-46af-a00d-ac874aa5d250",
+            "name": "Sylhet Gang-SG",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group involved in DDoS attacks and website defacements supporting Pakistan, with a history of targeting India.",
+            "aliases": [
+                "Sylhet Gang-SG"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--a13c3ce9-4277-4984-9f7a-411c0ba88470",
+            "name": "Mr Hamza",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan politically motivated hacktivist group active in DDoS attacks against Indian targets, with significant activity following Operation Sindoor.",
+            "aliases": [
+                "Mr Hamza"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--724e9117-d583-482d-bfa6-5fde2f951ca2",
+            "name": "Dark Cyber Gang",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group involved in DDoS, defacement, and implied data breach attacks during the cyber escalation.",
+            "aliases": [
+                "Dark Cyber Gang"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--3f837238-2de9-42f0-ac3e-de18c41f5379",
+            "name": "INDOHAXSEC",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Indonesian pro-Pakistan hacktivist group collaborating with Team Azrael, involved in DDoS and defacement attacks against Indian cyberspace.",
+            "aliases": [
+                "INDOHAXSEC"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--2fa4a692-ed3c-452c-9e65-33129ca9bb3c",
+            "name": "Team Insane Pakistan",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group involved in website defacement and data breaches targeting Indian entities; also connected to attacks related to the Israel-Palestine conflict.",
+            "aliases": [
+                "Team Insane Pakistan"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--eb1744e2-f951-4705-8aad-4bd382655d4b",
+            "name": "Garuda Error System",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group claiming responsibility for website defacements, including targeting Canadian websites.",
+            "aliases": [
+                "Garuda Error System"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--114151c6-2d24-4bc4-b4ac-a031e0304804",
+            "name": "Sumatra Utara Cyber Team",
+            "labels": [
+                "hacktivist",
+                "pro-Pakistan"
+            ],
+            "description": "Pro-Pakistan hacktivist group involved in DDoS, defacements, and implied data breaches targeting Indian organizations.",
+            "aliases": [
+                "Sumatra Utara Cyber Team"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--5d7451f8-e99b-46e6-9715-28404a6a8412",
+            "name": "Indian Cyber Force",
+            "labels": [
+                "hacktivist",
+                "pro-India"
+            ],
+            "description": "Pro-India hacktivist group with a history of targeting Pakistan; claimed to have breached Pakistan's Habib Bank Limited and engaged in defacement and data breach activities.",
+            "aliases": [
+                "Indian Cyber Force"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--c1b55f59-472d-453c-8137-c270cab8b986",
+            "name": "Cryptojackers of India",
+            "labels": [
+                "hacktivist",
+                "pro-India"
+            ],
+            "description": "Pro-India hacktivist group expected to escalate DDoS and defacement attacks against Pakistani targets.",
+            "aliases": [
+                "Cryptojackers of India"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--dfeec2af-01bb-4e01-b524-4d00afaba57f",
+            "name": "Dex4o4",
+            "labels": [
+                "hacktivist",
+                "pro-India"
+            ],
+            "description": "Pro-India hacktivist group expected to escalate DDoS and defacement attacks against Pakistani organizations.",
+            "aliases": [
+                "Dex4o4"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "threat-actor",
+            "id": "threat-actor--19a1a5b1-cbe8-4e21-bb47-53740d75268f",
+            "name": "Ghost Force",
+            "labels": [
+                "hacktivist",
+                "pro-India"
+            ],
+            "description": "Pro-India hacktivist group emerging as part of the domestic cyber ecosystem, expected to escalate DDoS and defacement activities against Pakistani targets.",
+            "aliases": [
+                "Ghost Force"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z",
+            "threat_actor_types": [
+                "hacktivist"
+            ]
+        },
+        {
+            "type": "malware",
+            "id": "malware--cc734d14-9577-4283-bef7-968427cc85bf",
+            "name": "Dance of the Hillary",
+            "labels": [
+                "trojan",
+                "malware"
+            ],
+            "description": "Malware reportedly spread through social media and email platforms during the India-Pakistan cyber conflict, possibly a recurring hoax but serves as an indicator of compromise.",
+            "is_family": "false",
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z"
+        },
+        {
+            "type": "malware",
+            "id": "malware--c05ae135-a931-43e5-a904-09f477573ea0",
+            "name": "tasksche.exe",
+            "labels": [
+                "malware"
+            ],
+            "description": "Malicious file distributed via email attachments, potentially used to compromise devices during the Indo-Pak cyber escalation.",
+            "is_family": "false",
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z"
+        },
+        {
+            "type": "vulnerability",
+            "id": "vulnerability--72e68c40-36bc-4799-bbc3-2d5da2406ff4",
+            "name": "CVE-2024-4577",
+            "description": "Critical PHP vulnerability exploited to gain remote code execution on affected Windows servers, actively targeted by hacktivist groups during the India-Pakistan cyber conflict.",
+            "created": "2024-05-01T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z"
+        },
+        {
+            "type": "vulnerability",
+            "id": "vulnerability--6e90bab2-a4a0-47f6-b0de-53b7e12d2a49",
+            "name": "Alone injector.php",
+            "description": "Vulnerability in PHP file upload plugins exploited to facilitate website defacements by injecting malicious code, widely used by multiple pro-Pakistan hacktivist groups.",
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z"
+        },
+        {
+            "type": "indicator",
+            "id": "indicator--71b8849a-8f28-4b94-8882-ab37307d6e63",
+            "name": "Malicious PDF - Report & Update Regarding Pahalgam Terror Attack.pdf",
+            "description": "Malicious PDF file used in phishing campaigns to distribute malware during the India-Pakistan cyber escalation.",
+            "pattern": "[file:name = 'Report & Update Regarding Pahalgam Terror Attack.pdf']",
+            "valid_from": "2025-05-07T00:00:00Z",
+            "labels": [
+                "malicious-file"
+            ]
+        },
+        {
+            "type": "indicator",
+            "id": "indicator--fd5f0b49-8a9b-46e9-8a9e-7ef587c7df6b",
+            "name": "Potential DNS Reflection/Amplification Attack Ports",
+            "description": "UDP ports 123, 53, 1900, 11211, 19, and 389 identified as potential targets for reflection/amplification DDoS attacks during the cyber escalation.",
+            "pattern": "[network-traffic:dst_port IN (123,53,1900,11211,19,389) AND network-traffic:protocols[*] = 'udp']",
+            "valid_from": "2025-05-07T00:00:00Z",
+            "labels": [
+                "network-traffic",
+                "potential-dos-vector"
+            ]
+        },
+        {
+            "type": "infrastructure",
+            "id": "infrastructure--c2ccd169-7240-41fb-88d3-652a8efcb2c8",
+            "name": "Bobik Botnet",
+            "description": "Botnet used to conduct DDoS attacks, spread via the RedLine Stealer malware during the Indo-Pak cyber conflict.",
+            "labels": [
+                "botnet",
+                "ddos"
+            ],
+            "created": "2025-05-07T00:00:00Z",
+            "modified": "2025-05-07T00:00:00Z"
+        },
+        {
+            "type": "domain-name",
+            "id": "domain-name--91d3e334-cae5-455d-992f-8841563500d2",
+            "value": "bsnl.co.in"
+        },
+        {
+            "type": "domain-name",
+            "id": "domain-name--c73d0f5e-7429-45fd-b67a-f97f9fb1bd8b",
+            "value": "incometax.gov.in"
+        },
+        {
+            "type": "domain-name",
+            "id": "domain-name--d7737328-65e4-4e94-8f0d-7ace529f890a",
+            "value": "hal-india.co.in"
+        },
+        {
+            "type": "domain-name",
+            "id": "domain-name--156ef266-a564-40e6-a82e-cc7dd9d98fa0",
+            "value": "indianrailways.gov.in"
+        },
+        {
+            "type": "domain-name",
+            "id": "domain-name--2938672d-d3eb-43b2-acb0-d9abc151ca39",
+            "value": "pmo.gov.in"
+        },
+        {
+            "type": "file",
+            "id": "file--fc1f1f70-bbf0-4e41-93e8-651722ab6ca6",
+            "name": "Report & Update Regarding Pahalgam Terror Attack.pdf"
+        },
+        {
+            "type": "file",
+            "id": "file--267efe6c-dc94-4d03-9e10-d51a39372de5",
+            "name": "tasksche.exe"
+        },
+        {
+            "type": "artifact",
+            "id": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "mime_type": "application/x-php",
+            "payload_bin": "Alone injector.php"
+        },
+        {
+            "type": "software",
+            "id": "software--c1251939-a602-4d70-b878-7fcae115fbde",
+            "name": "Dance of the Hillary"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--5c519c14-85a7-416a-b6fb-b84afaa19f25",
+            "user_id": "Keymous+"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--10af85f4-e7f3-4f7c-8879-492ae9485ca2",
+            "user_id": "AnonSec"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--2c45fdda-7c1b-410f-9402-3e14c3919e7d",
+            "user_id": "Electronic Army Special Forces"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--e0d01ab2-e402-45f3-8a5d-613ee38407e7",
+            "user_id": "Nation of Saviors"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--cf2e25e7-d721-4716-b7be-9249f47a2ed9",
+            "user_id": "Sylhet Gang-SG"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--20f735f9-81d8-4847-b629-0b5ecd583321",
+            "user_id": "Mr Hamza"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--bf090d8a-aac5-4cb3-a006-347bbe36d69a",
+            "user_id": "Dark Cyber Gang"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--f6003eb5-c8e1-4197-909e-dbfd213311ba",
+            "user_id": "INDOHAXSEC"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--68272462-f8dd-4f4d-9778-3c18cd51a2bd",
+            "user_id": "Team Insane Pakistan"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--eec19e56-587b-417f-ae44-f4eb69ce6ba4",
+            "user_id": "Garuda Error System"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--8c424469-6721-415f-ad5c-8dee18f4b26c",
+            "user_id": "Sumatra Utara Cyber Team"
+        },
+        {
+            "type": "user-account",
+            "id": "user-account--b6318c52-60ce-4cce-a9aa-47560dfbfe86",
+            "user_id": "Indian Cyber Force"
+        },
+        {
+            "type": "software",
+            "id": "software--8dcd7b50-154b-4a61-b688-c00e1bfcf8df",
+            "name": "MegaMedusa"
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--8a62f9dc-f74e-4192-8fe4-cc51dbf887d8",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--df4352f4-dc56-4d37-af11-0adbcd3ce114",
+            "target_ref": "infrastructure--c2ccd169-7240-41fb-88d3-652a8efcb2c8",
+            "description": "Keymous+ uses the Bobik Botnet to conduct DDoS attacks."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--3a974758-7e14-4764-9a50-37b1d6949cb5",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--f6b745db-8e91-4bc8-b8a6-3f9b40d24a13",
+            "target_ref": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "description": "AnonSec exploits the 'Alone injector.php' vulnerability in PHP file upload plugins to facilitate website defacements."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--1bd77a4c-1530-4843-8a85-4f40a68dd142",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--2842bc29-dde8-46af-a00d-ac874aa5d250",
+            "target_ref": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "description": "Sylhet Gang-SG exploits the 'Alone injector.php' vulnerability to conduct website defacements."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--7e2ad0d7-5bb6-4202-9143-12f3bb2e4a55",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--2fa4a692-ed3c-452c-9e65-33129ca9bb3c",
+            "target_ref": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "description": "Team Insane Pakistan uses the 'Alone injector.php' vulnerability to perform website defacements."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--63ba1c8b-43f7-4ae9-8d3c-eb552a4efcd1",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--eb1744e2-f951-4705-8aad-4bd382655d4b",
+            "target_ref": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "description": "Garuda Error System claims use of the 'Alone injector.php' exploit for website defacements."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--730709c9-4245-40a8-b17a-c3d01d4d7f5b",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--114151c6-2d24-4bc4-b4ac-a031e0304804",
+            "target_ref": "artifact--6529f016-1795-4ac8-ae79-1e6107d2b402",
+            "description": "Sumatra Utara Cyber Team implied use of the 'Alone injector.php' vulnerability for website defacements."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--c3cdb8d0-f987-4010-b2cc-d91ddd3aa059",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--80d98979-65a3-4bc6-9eea-7cad237ac84c",
+            "target_ref": "indicator--71b8849a-8f28-4b94-8882-ab37307d6e63",
+            "description": "Electronic Army Special Forces uses malicious PDF 'Report & Update Regarding Pahalgam Terror Attack.pdf' in phishing campaigns."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--e553c2dd-e089-4664-9895-60f98cf4e35a",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--df4352f4-dc56-4d37-af11-0adbcd3ce114",
+            "target_ref": "indicator--71b8849a-8f28-4b94-8882-ab37307d6e63",
+            "description": "Keymous+ uses malicious PDF 'Report & Update Regarding Pahalgam Terror Attack.pdf' in phishing campaigns."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--927d8781-4350-4890-8ba0-3a74ec5c7171",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--df4352f4-dc56-4d37-af11-0adbcd3ce114",
+            "target_ref": "malware--cc734d14-9577-4283-bef7-968427cc85bf",
+            "description": "Keymous+ attributed with spreading the malware 'Dance of the Hillary' during the cyber conflict."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--cd464daa-59ee-4d4f-8a04-eeb4e249ccd5",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "uses",
+            "source_ref": "threat-actor--c1b55f59-472d-453c-8137-c270cab8b986",
+            "target_ref": "malware--c05ae135-a931-43e5-a904-09f477573ea0",
+            "description": "Malware 'tasksche.exe' was distributed during the Indo-Pak cyber escalation, linked to cross-border actors."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--298d720b-5808-427f-9772-a72061fd9c1d",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "targets",
+            "source_ref": "threat-actor--df4352f4-dc56-4d37-af11-0adbcd3ce114",
+            "target_ref": "domain-name--91d3e334-cae5-455d-992f-8841563500d2",
+            "description": "Keymous+ targeted the domain bsnl.co.in in DDoS attacks."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--3e4ca172-4e68-4888-9d20-1cd96865b917",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "targets",
+            "source_ref": "threat-actor--f6b745db-8e91-4bc8-b8a6-3f9b40d24a13",
+            "target_ref": "domain-name--2938672d-d3eb-43b2-acb0-d9abc151ca39",
+            "description": "AnonSec targeted the Indian government portal pmo.gov.in for DDoS and defacement."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--ca7177ea-cf37-41fd-be3f-463ab5e730ee",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "targets",
+            "source_ref": "threat-actor--2fa4a692-ed3c-452c-9e65-33129ca9bb3c",
+            "target_ref": "domain-name--c73d0f5e-7429-45fd-b67a-f97f9fb1bd8b",
+            "description": "Team Insane Pakistan involved in targeting incometax.gov.in domain."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--a08117be-b1ec-470b-b96e-59fe026854fd",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "targets",
+            "source_ref": "threat-actor--724e9117-d583-482d-bfa6-5fde2f951ca2",
+            "target_ref": "domain-name--91d3e334-cae5-455d-992f-8841563500d2",
+            "description": "Dark Cyber Gang targeted bsnl.co.in domain in DDoS campaigns."
+        },
+        {
+            "type": "relationship",
+            "id": "relationship--ec218bb7-8261-45f4-9aff-a630b382e6d4",
+            "created": "2025-05-08T00:00:00Z",
+            "modified": "2025-05-08T00:00:00Z",
+            "relationship_type": "targets",
+            "source_ref": "threat-actor--5d7451f8-e99b-46e6-9715-28404a6a8412",
+            "target_ref": "domain-name--d7737328-65e4-4e94-8f0d-7ace529f890a",
+            "description": "Indian Cyber Force targeted hal-india.co.in domain in retaliatory cyber operations."
+        }
+    ]
+}

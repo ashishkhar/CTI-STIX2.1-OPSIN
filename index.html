@@ -2,70 +2,1996 @@
 <html lang="en">
 
   <head>
-    <title>STIX Viewer</title>
+    <title>Enhanced STIX Viewer</title>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="application.css" />
     <script src="require.js" data-main="application"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* Core UI Styles */
+      :root {
+        --primary-color: #3B82F6;
+        --primary-dark: #2563EB;
+        --primary-light: #DBEAFE;
+        --secondary-color: #10B981;
+        --danger-color: #EF4444;
+        --warning-color: #F59E0B;
+        --dark-color: #1F2937;
+        --light-color: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-400: #9CA3AF;
+        --gray-500: #6B7280;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        --border-radius-sm: 0.125rem;
+        --border-radius: 0.25rem;
+        --border-radius-md: 0.375rem;
+        --border-radius-lg: 0.5rem;
+        --border-radius-xl: 0.75rem;
+        --border-radius-2xl: 1rem;
+        --border-radius-3xl: 1.5rem;
+        --border-radius-full: 9999px;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        color: var(--gray-800);
+        background-color: var(--gray-100);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        line-height: 1.5;
+      }
+
+      /* Top Header */
+      #top-header-bar {
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-md);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      #top-header-bar h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      #top-header-bar img {
+        filter: brightness(0) invert(1);
+        transition: transform var(--transition-fast);
+      }
+
+      #top-header-bar img:hover {
+        transform: scale(1.1);
+      }
+
+      #chosen-files {
+        margin-left: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: normal;
+        color: var(--primary-light);
+        opacity: 0.9;
+      }
+
+      /* Floating Toolbar */
+      .floating-toolbar {
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: 1rem;
+        z-index: 1000;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        transition: transform var(--transition);
+        border: 1px solid var(--gray-200);
+      }
+      
+      .floating-toolbar:hover {
+        transform: translateX(-5px);
+      }
+      
+      .floating-toolbar button {
+        margin: 0;
+        padding: 0.6rem 1rem;
+        border: none;
+        background: white;
+        color: var(--gray-700);
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+        width: 160px;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+      }
+      
+      .floating-toolbar button:hover {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+        transform: translateX(-5px);
+      }
+      
+      .floating-toolbar button i {
+        margin-right: 0.75rem;
+        width: 16px;
+        text-align: center;
+        color: var(--primary-color);
+      }
+      
+      .floating-toolbar button:hover i {
+        transform: scale(1.1);
+      }
+
+      /* Search Box */
+      .search-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 0 0.75rem;
+        border: 1px solid var(--gray-300);
+        transition: all var(--transition-fast);
+      }
+      
+      .search-container:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+      }
+      
+      .search-container input {
+        flex-grow: 1;
+        border: none;
+        padding: 0.6rem 0.5rem;
+        outline: none;
+        font-size: 0.9rem;
+        color: var(--gray-800);
+      }
+      
+      .search-container i {
+        color: var(--gray-500);
+      }
+
+      /* Canvas Layout */
+      #canvas-container {
+        display: block;
+        height: 40vh;
+        background-color: white;
+        position: fixed;
+        top: 61px;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        overflow: hidden;
+      }
+
+      #canvas-wrapper {
+        overflow: hidden;
+        position: relative;
+        background-color: var(--gray-100);
+        width: 100%;
+        height: 100%;
+      }
+
+      #canvas {
+        width: 100%;
+        height: calc(100% - 40px);
+      }
+
+      #timelineControls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-top: 1px solid var(--gray-200);
+        height: 40px;
+        box-sizing: border-box;
+      }
+
+      /* Timeline slider */
+      #timeline {
+        flex: 1;
+        height: 4px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: var(--gray-300);
+        outline: none;
+        border-radius: var(--border-radius-full);
+        transition: height var(--transition-fast);
+      }
+
+      #timeline::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        transition: transform var(--transition-fast);
+      }
+
+      #timeline:hover {
+        height: 6px;
+      }
+
+      #timeline::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+
+      #timelineCheckbox {
+        margin-right: 0.25rem;
+      }
+
+      /* Canvas instructions */
+      #canvas-wrapper p {
+        display: none;
+      }
+
+      #canvas-instructions {
+        position: absolute;
+        bottom: 45px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-size: 0.8rem;
+        color: var(--gray-700);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        opacity: 0.8;
+        transition: opacity var(--transition-fast);
+        pointer-events: none;
+      }
+
+      #canvas-instructions:hover {
+        opacity: 1;
+      }
+
+      /* Sidebars */
+      .sidebar {
+        background-color: white;
+        border-left: 1px solid var(--gray-200);
+        padding: 0;
+        width: 320px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-width: 320px;
+        min-width: 250px;
+        flex-shrink: 0;
+      }
+      
+      .sidebar:first-of-type {
+        border-left: none;
+      }
+
+      .sidebar h2 {
+        background-color: var(--primary-color);
+        margin: 0;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        border-bottom: 1px solid var(--gray-200);
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .sidebar h2 i {
+        margin-right: 0.5rem;
+      }
+
+      .sidebar h2::after {
+        display: none;
+      }
+
+      .sidebar h3 {
+        margin: 0.75rem 0 0.5rem;
+        padding: 0 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gray-600);
+      }
+
+      .sidebar-content {
+        padding: 0.75rem 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+        display: block !important;
+      }
+
+      .sidebar.collapsed {
+        width: 42px;
+      }
+
+      .sidebar.collapsed h2 {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        height: 200px;
+        padding: 1rem 0.75rem;
+      }
+
+      .sidebar.collapsed h2::after {
+        display: none;
+      }
+
+      .sidebar.collapsed .sidebar-content {
+        display: none;
+      }
+
+      /* Selected node styles */
+      #selection {
+        overflow-y: auto;
+        padding: 0.75rem 1.25rem;
+      }
+
+      #node-edit-container {
+        padding: 0.75rem 1.25rem 1.25rem;
+        border-top: 1px solid var(--gray-200);
+      }
+
+      #node-edit-container h3 {
+        margin-top: 0;
+        color: var(--primary-color);
+      }
+
+      .selected-object-prop-name {
+        color: var(--gray-700);
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+
+      .selected-object-text-value {
+        color: var(--gray-800);
+      }
+
+      .selected-object-text-value-ref {
+        color: var(--primary-color);
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 3px;
+      }
+
+      .selected-object-text-value-ref:hover {
+        color: var(--primary-dark);
+      }
+
+      .selected-object-nontext-value {
+        color: var(--gray-600);
+        font-style: italic;
+      }
+
+      .selected-object-object-content {
+        padding-left: 1.25rem;
+        border-left: 2px solid var(--gray-200);
+        margin: 0.5rem 0;
+      }
+
+      .selected-object-list {
+        padding-left: 1.5rem;
+        margin: 0.25rem 0;
+      }
+
+      .selected-object-list li {
+        margin-bottom: 0.25rem;
+      }
+
+      /* Connections display */
+      #connections-incoming, #connections-outgoing {
+        padding: 0 1.25rem;
+      }
+
+      #connections ol {
+        padding-left: 1.25rem;
+      }
+
+      #connections details {
+        margin-bottom: 0.5rem;
+      }
+
+      #connections summary {
+        cursor: pointer;
+        padding: 0.25rem 0;
+      }
+
+      #connections summary:hover {
+        color: var(--primary-color);
+      }
+
+      /* Legend styling */
+      #legend-content {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      #legend-content td {
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+      }
+
+      #legend-content td:hover {
+        background-color: var(--gray-100);
+      }
+
+      #legend-content img {
+        vertical-align: middle;
+        margin-right: 0.75rem;
+        width: 24px;
+        height: 24px;
+      }
+
+      .typeHidden {
+        opacity: 0.5;
+        text-decoration: line-through;
+      }
+
+      /* Bottom Panel */
+      .bottom-panel {
+        position: fixed;
+        top: calc(40vh + 61px);
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        z-index: 90;
+        border-top: 1px solid var(--gray-200);
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .bottom-panel.expanded {
+        height: calc(60vh - 61px);
+      }
+      
+      .tab-container {
+        display: flex;
+        background-color: var(--gray-100);
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        overflow-x: auto;
+      }
+      
+      .tab {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        color: var(--gray-600);
+        font-weight: 500;
+        position: relative;
+        transition: all var(--transition-fast);
+        border-right: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+      }
+      
+      .tab:hover {
+        background-color: var(--gray-200);
+        color: var(--primary-color);
+      }
+      
+      .tab.active {
+        background-color: white;
+        color: var(--primary-color);
+        font-weight: 600;
+        border-bottom: 2px solid var(--primary-color);
+      }
+      
+      .tab i {
+        font-size: 1rem;
+      }
+      
+      /* Tab controls */
+      .tab-controls {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        border-left: 1px solid var(--gray-200);
+      }
+      
+      .tab-control-btn {
+        background: none;
+        border: none;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+      }
+      
+      .tab-control-btn:hover {
+        background-color: var(--gray-200);
+        color: var(--primary-color);
+      }
+      
+      .tab-control-btn i {
+        font-size: 1rem;
+      }
+      
+      /* Improved data content */
+      .tab-content {
+        padding: 0;
+        display: none;
+        flex: 1;
+        overflow: auto;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      /* Data view tabs */
+      .data-view-tabs {
+        display: flex;
+        background-color: white;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0.5rem 1rem 0;
+      }
+      
+      .data-view-tab {
+        padding: 0.5rem 1rem;
+        background-color: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-bottom: none;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        cursor: pointer;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--gray-600);
+      }
+      
+      .data-view-tab.active {
+        background-color: white;
+        color: var(--primary-color);
+        font-weight: 500;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+      }
+      
+      /* Table improvements */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .data-table th {
+        position: sticky;
+        top: 0;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        z-index: 2;
+      }
+      
+      .data-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.9rem;
+      }
+      
+      .data-table tr:nth-child(even) {
+        background-color: var(--gray-50);
+      }
+      
+      .data-table tr:hover td {
+        background-color: var(--primary-light);
+      }
+
+      .data-table td:last-child {
+        white-space: nowrap;
+      }
+
+      .data-table td button {
+        padding: 0.35rem 0.75rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
+        transition: all var(--transition-fast);
+      }
+
+      .data-table td button.view-btn {
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+      }
+
+      .data-table td button.view-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .data-table td button.edit-btn {
+        background-color: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .data-table td button.edit-btn:hover {
+        background-color: var(--gray-300);
+        color: var(--gray-900);
+      }
+
+      /* Indicator styles */
+      .indicator-value {
+        font-family: monospace;
+        background: var(--gray-100);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--border-radius);
+        font-size: 0.85rem;
+      }
+
+      /* Editor styles */
+      .json-editor {
+        width: 100%;
+        height: 300px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        font-size: 0.9rem;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background-color: var(--gray-100);
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      .json-editor:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+      }
+
+      /* Edit actions */
+      .edit-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .edit-actions button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+      }
+
+      .edit-actions button:first-child {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .edit-actions button:first-child:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .edit-actions button.cancel {
+        background-color: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .edit-actions button.cancel:hover {
+        background-color: var(--gray-300);
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(3px);
+        animation: fadeIn var(--transition-fast);
+      }
+      
+      .modal-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 1.5rem;
+        border-radius: var(--border-radius-lg);
+        width: 80%;
+        max-width: 900px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-xl);
+        animation: slideDown 0.3s ease-out;
+      }
+
+      .modal-content h2 {
+        margin-top: 0;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .modal-content h2::before {
+        content: "\f0ae";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        color: var(--primary-color);
+      }
+      
+      .close-button {
+        color: var(--gray-500);
+        float: right;
+        font-size: 1.5rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: color var(--transition-fast);
+        line-height: 1;
+      }
+      
+      .close-button:hover {
+        color: var(--danger-color);
+      }
+
+      /* IOC table */
+      .indicator-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+
+      .indicator-table th {
+        padding: 0.75rem 1rem;
+        background-color: var(--gray-100);
+        text-align: left;
+        font-weight: 600;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-300);
+      }
+
+      .indicator-table td {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--gray-300);
+      }
+
+      .indicator-table tr:hover td {
+        background-color: var(--gray-100);
+      }
+
+      /* Uploader styles - enhanced */
+      #uploader {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-lg);
+      }
+
+      #uploader h2 {
+        margin-top: 0;
+        color: var(--primary-color);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .upload-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .upload-method {
+        background: var(--gray-100);
+        border-radius: var(--border-radius-lg);
+        padding: 1.25rem;
+        transition: transform var(--transition-fast);
+      }
+
+      .upload-method:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .upload-method p {
+        margin: 0 0 1rem;
+        color: var(--gray-800);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .upload-method p i {
+        color: var(--primary-color);
+      }
+
+      .file-upload-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+        background: white;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        color: var(--gray-700);
+        font-weight: 500;
+        margin-bottom: 1rem;
+        transition: all var(--transition-fast);
+      }
+
+      .file-upload-label:hover {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+        border-color: var(--primary-color);
+      }
+
+      .file-upload-label input {
+        display: none;
+      }
+
+      .upload-zone {
+        border: 2px dashed var(--gray-300);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--gray-500);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+      }
+
+      .upload-zone i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .upload-zone p {
+        margin: 0;
+        color: var(--gray-500);
+        font-weight: normal;
+        display: block;
+      }
+
+      .upload-zone:hover, .upload-zone.drag-over {
+        border-color: var(--primary-color);
+        background: var(--primary-light);
+        color: var(--primary-dark);
+      }
+
+      .upload-zone:hover p, .upload-zone.drag-over p {
+        color: var(--primary-dark);
+      }
+
+      .input-group {
+        display: flex;
+        margin-bottom: 1rem;
+      }
+
+      .input-group input {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        outline: none;
+        transition: all var(--transition-fast);
+      }
+
+      .input-group input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+      }
+
+      .input-group button {
+        padding: 0.6rem 1rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .input-group button:hover {
+        background: var(--primary-dark);
+      }
+
+      .url-example {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+      }
+
+      .url-example p {
+        margin: 0 0 0.25rem;
+        font-weight: normal;
+        display: block;
+      }
+
+      .url-example a {
+        color: var(--primary-color);
+        text-decoration: none;
+        word-break: break-all;
+        font-size: 0.8rem;
+      }
+
+      .url-example a:hover {
+        text-decoration: underline;
+      }
+
+      .upload-method textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-family: monospace;
+        resize: vertical;
+        margin-bottom: 1rem;
+        transition: all var(--transition-fast);
+      }
+
+      .upload-method textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+      }
+
+      .upload-method button {
+        padding: 0.6rem 1.25rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: fit-content;
+      }
+
+      .upload-method button:hover {
+        background: var(--primary-dark);
+      }
+
+      /* Bottom panel toggle */
+      #bottom-panel-toggle {
+        display: none;
+      }
+
+      /* Actions bar in modals */
+      .actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        flex-wrap: wrap;
+      }
+
+      .actions-bar .search-container {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        padding: 0.4rem 0.8rem;
+        background: var(--gray-200);
+        color: var(--gray-700);
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all var(--transition-fast);
+      }
+
+      .filter-btn:hover {
+        background: var(--gray-300);
+      }
+
+      .filter-btn.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      /* Toast notifications */
+      #toast-container {
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 300px;
+      }
+
+      .toast {
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        background: white;
+        color: var(--gray-800);
+        box-shadow: var(--shadow-lg);
+        animation: slideLeft 0.3s ease-out;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .toast-success {
+        border-left-color: var(--secondary-color);
+      }
+
+      .toast-success i {
+        color: var(--secondary-color);
+      }
+
+      .toast-error {
+        border-left-color: var(--danger-color);
+      }
+
+      .toast-error i {
+        color: var(--danger-color);
+      }
+
+      .toast-warning {
+        border-left-color: var(--warning-color);
+      }
+
+      .toast-warning i {
+        color: var(--warning-color);
+      }
+
+      .toast-icon {
+        font-size: 1.2rem;
+      }
+
+      .toast-content {
+        flex: 1;
+      }
+
+      .toast-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .toast-message {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+      }
+
+      .toast-close {
+        color: var(--gray-500);
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0.25rem;
+      }
+
+      .toast-close:hover {
+        color: var(--gray-800);
+      }
+
+      @keyframes slideLeft {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      /* Editor wrapper */
+      .editor-wrapper {
+        position: relative;
+        margin-bottom: 1rem;
+      }
+
+      .editor-wrapper .editor-status {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--gray-500);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--border-radius);
+      }
+
+      .editor-actions {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .editor-actions button {
+        background: var(--gray-200);
+        border: none;
+        border-radius: var(--border-radius);
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        color: var(--gray-700);
+      }
+
+      .editor-actions button:hover {
+        background: var(--gray-300);
+        color: var(--gray-900);
+      }
+
+      /* Loading spinner */
+      .spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        margin-right: 0.5rem;
+      }
+
+      .spinner-dark {
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: var(--gray-700);
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .upload-methods {
+          grid-template-columns: 1fr;
+        }
+
+        .floating-toolbar {
+          top: auto;
+          bottom: 20px;
+          right: 20px;
+          flex-direction: column-reverse;
+        }
+
+        #bottom-panel.expanded {
+          height: 50vh;
+        }
+      }
+
+      /* Side panels in bottom section */
+      .bottom-panel-content {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      
+      .main-data-section {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        border-right: 1px solid var(--gray-200);
+      }
+      
+      .tab-container {
+        display: flex;
+        background-color: var(--gray-100);
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        overflow-x: auto;
+      }
+
+      /* Sidebars now in bottom panel */
+      .sidebar {
+        background-color: white;
+        border-left: 1px solid var(--gray-200);
+        padding: 0;
+        width: 320px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-width: 320px;
+        min-width: 250px;
+        flex-shrink: 0;
+      }
+      
+      .sidebar:first-of-type {
+        border-left: none;
+      }
+
+      .sidebar h2 {
+        background-color: var(--primary-color);
+        margin: 0;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        border-bottom: 1px solid var(--gray-200);
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .sidebar h2 i {
+        margin-right: 0.5rem;
+      }
+
+      .sidebar h2::after {
+        display: none;
+      }
+
+      .sidebar h3 {
+        margin: 0.75rem 0 0.5rem;
+        padding: 0 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gray-600);
+      }
+
+      .sidebar-content {
+        padding: 0.75rem 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+        display: block !important;
+      }
+
+      /* Better tabs design for the data section */
+      .tab-container {
+        display: flex;
+        background-color: var(--gray-100);
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        overflow-x: auto;
+      }
+      
+      .tab {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        color: var(--gray-600);
+        font-weight: 500;
+        position: relative;
+        transition: all var(--transition-fast);
+        border-right: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+      }
+      
+      .tab:hover {
+        background-color: var(--gray-200);
+        color: var(--primary-color);
+      }
+      
+      .tab.active {
+        background-color: white;
+        color: var(--primary-color);
+        font-weight: 600;
+        border-bottom: 2px solid var(--primary-color);
+      }
+      
+      .tab i {
+        font-size: 1rem;
+      }
+      
+      /* Improved data content */
+      .tab-content {
+        padding: 0;
+        display: none;
+        flex: 1;
+        overflow: auto;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      /* Data view tabs */
+      .data-view-tabs {
+        display: flex;
+        background-color: white;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0.5rem 1rem 0;
+      }
+      
+      .data-view-tab {
+        padding: 0.5rem 1rem;
+        background-color: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-bottom: none;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        cursor: pointer;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--gray-600);
+      }
+      
+      .data-view-tab.active {
+        background-color: white;
+        color: var(--primary-color);
+        font-weight: 500;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+      }
+      
+      /* Table improvements */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .data-table th {
+        position: sticky;
+        top: 0;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        z-index: 2;
+      }
+      
+      .data-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.9rem;
+      }
+      
+      .data-table tr:nth-child(even) {
+        background-color: var(--gray-50);
+      }
+      
+      .data-table tr:hover td {
+        background-color: var(--primary-light);
+      }
+
+      .data-table td:last-child {
+        white-space: nowrap;
+      }
+
+      .data-table td button {
+        padding: 0.35rem 0.75rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
+        transition: all var(--transition-fast);
+      }
+
+      .data-table td button.view-btn {
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+      }
+
+      .data-table td button.view-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .data-table td button.edit-btn {
+        background-color: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .data-table td button.edit-btn:hover {
+        background-color: var(--gray-300);
+        color: var(--gray-900);
+      }
+
+      /* Responsive adjustments for smaller screens */
+      @media (max-width: 1200px) {
+        .sidebar {
+          min-width: 200px;
+        }
+      }
+      
+      @media (max-width: 992px) {
+        .bottom-panel-content {
+          flex-direction: column;
+        }
+        
+        .sidebar {
+          width: 100%;
+          max-width: none;
+          border-left: none;
+          border-top: 1px solid var(--gray-200);
+        }
+      }
+
+      /* Sidebar toggle button styles */
+      .sidebar-toggle {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font: inherit;
+        color: inherit;
+        outline: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+      }
+
+      .sidebar-toggle i {
+        font-size: 1rem;
+      }
+      
+      /* Enhanced sidebar toggle styles */
+      .sidebar-toggle {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: var(--border-radius);
+        width: 28px;
+        height: 28px;
+        transition: background-color var(--transition-fast), transform var(--transition-fast);
+      }
+      
+      .sidebar-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      
+      .sidebar-toggle i {
+        transition: transform var(--transition) ease-in-out;
+      }
+      
+      .sidebar.collapsed {
+        width: auto;
+        min-width: 0;
+        flex: 0;
+      }
+      
+      .sidebar.collapsed h2 {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        height: auto;
+        padding: 1rem 0.5rem;
+        white-space: nowrap;
+      }
+      
+      /* Add responsive adjustment for collapsed sidebar layout */
+      @media (max-width: 992px) {
+        .sidebar.collapsed {
+          width: 100%;
+          min-width: 100%;
+        }
+        
+        .sidebar.collapsed h2 {
+          writing-mode: horizontal-tb;
+          transform: none;
+          padding: 0.75rem 1.25rem;
+          height: auto;
+        }
+      }
+      
+      /* View mode switching */
+      .bottom-panel-header {
+        background-color: var(--gray-100);
+        border-bottom: 1px solid var(--gray-200);
+      }
+      
+      .view-mode {
+        display: none;
+        height: 100%;
+        overflow: hidden;
+      }
+      
+      .view-mode.active {
+        display: block;
+      }
+      
+      /* Details view layout - full width horizontal */
+      #details-view {
+        width: 100%; 
+        height: 100%;
+        overflow: hidden;
+      }
+      
+      .details-panels {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .details-panels .sidebar {
+        flex: 1;
+        width: 33.333%;
+        border-left: 1px solid var(--gray-200);
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+        border-top: none;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      .details-panels .sidebar:first-child {
+        border-left: none;
+      }
+      
+      .details-panels .sidebar h2 {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--primary-color);
+        border-radius: 0;
+        flex-shrink: 0;
+        font-size: 1rem;
+        box-sizing: border-box;
+        margin: 0;
+      }
+      
+      .details-panels .sidebar-content {
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+      
+      /* Improve appearance in horizontal layout */
+      .details-panels #selection,
+      .details-panels #connections-incoming,
+      .details-panels #connections-outgoing,
+      .details-panels #legend-content {
+        width: 100%;
+      }
+      
+      /* Make connection edges more readable */
+      .details-panels .selected-object-text-value-ref {
+        word-break: break-word;
+      }
+      
+      /* Limit width of text to prevent horizontal scrolling */
+      .details-panels .selected-object-text-value,
+      .details-panels .selected-object-nontext-value {
+        word-break: break-word;
+      }
+      
+      /* Improve spacing in details panels */
+      .details-panels #selection {
+        line-height: 1.6;
+      }
+      
+      .details-panels h3 {
+        margin-top: 1rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+      
+      /* Legend styling in details view */
+      .details-panels #legend-content {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .details-panels #legend-content td {
+        padding: 0.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        white-space: nowrap;
+        font-size: 0.9rem;
+      }
+      
+      .details-panels #legend-content img {
+        vertical-align: middle;
+        margin-right: 0.5rem;
+        width: 20px;
+        height: 20px;
+      }
+      
+      /* For small screens stack panels vertically */
+      @media (max-width: 992px) {
+        .details-panels {
+          flex-direction: column;
+          overflow-y: auto;
+        }
+        
+        .details-panels .sidebar {
+          width: 100%;
+          border-left: none;
+          border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .details-panels .sidebar:last-child {
+          border-bottom: none;
+        }
+      }
+    </style>
   </head>
 
   <body>
     <div id="top-header-bar">
       <h1>
-        <span id="header">STIX Visualizer</span><span id="chosen-files"></span>
+        <i class="fas fa-project-diagram"></i> <span id="header">STIX Visualizer</span><span id="chosen-files"></span>
       </h1>
-      <a href="https://github.com/oasis-open/cti-stix-visualization/">
-        <img src="GitHub-Mark-64px.png" alt="View source on GitHub" width="32" height="32">
-      </a>
+      <div class="header-actions">
+        <a href="https://github.com/oasis-open/cti-stix-visualization/" target="_blank" title="View on GitHub">
+          <img src="GitHub-Mark-64px.png" alt="View source on GitHub" width="24" height="24">
+        </a>
+      </div>
     </div>
 
-    <div id="uploader">
-      <p>Drop some STIX 2.x here!</p>
-      <input type="file" id="files" name="files" /><br>
-      <p>-- OR --</p>
-      <p>Fetch some STIX 2.x from this URL!</p>
-      <input type="text" id="url" name="url" placeholder="Paste URL here" /><br>
-      <button id="fetch-url">Fetch</button>
-      <p>-- OR --</p>
-      <p>Pass it as a url parameter, like so:</p><a href="https://oasis-open.github.io/cti-stix-visualization/?url=https://raw.githubusercontent.com/oasis-open/cti-stix-visualization/master/test.json">https://oasis-open.github.io/cti-stix-visualization/?url=https://raw.githubusercontent.com/oasis-open/cti-stix-visualization/master/test.json</a>
-      <p>-- OR --</p>
-      <p>Paste some STIX 2.x here!</p>
-      <textarea id="paste-area-stix-json" name="pasted" placeholder="Copy/Paste JSON data here..."></textarea><br>
-      <button id="paste-parser">Parse</button>
-      <br />
-      <p>-- Configuration --</p>
-      <textarea id="paste-area-custom-config" name="pasted" placeholder="Copy/Paste, in JSON format, (if you want to specify this) your custom config for the graph as such: &#10;{&#10;&quot;&lt;objectType&gt;&quot;: &#10;&#9;{&#10;&#9;&#9;&quot;displayProperty&quot;: &lt;nameOfProperty&gt;, &#10;&#9;&#9;&quot;displayIcon&quot;: &lt;nameOfIconFile&gt;,&#10;&#9;&#9;&quot;embeddedRelationships&quot;: [...relationships...]&#10;&#9;&#9;&quot;timestampList&quot;: [...timestampProperties...]&#10;&#9;},&#10;&quot;userLabels&quot;:&#10;&#9;{&#10;&#9;&#9;&quot;&lt;STIX ID&gt;&quot;: &quot;a label&quot;,&#10;&#9;&#9;...&#10;&#9;},&#10;&quot;include&quot;: &lt;STIX object filter criteria&gt;,&#10;&quot;exclude&quot;: &lt;STIX object filter criteria&gt;&#10;}&#10;&#10;&quot;&lt;objectType&gt;&quot; lets you customize how the node is displayed in the graph per-type; &quot;userLabels&quot; lets you customize labels per-ID.  For type-specific customization, please note that the above properties are the only currently-supported properties, and at least 1 of them has to be specified.  ID-specific label customization will take priority over type-specific labels.&#10;&#10;Each relationship in the &quot;embeddedRelationships&quot; list is a [&quot;&lt;property path&gt;&quot;, &quot;&lt;edge label&gt;&quot;, &lt;edge direction boolean&gt;] triple.  The property path should refer to a _ref(s) property somewhere within objects of that type."></textarea>
+    <div id="uploader" class="hidden">
+      <h2><i class="fas fa-upload"></i> Load STIX 2.x Data</h2>
+      
+      <div class="upload-methods">
+        <div class="upload-method">
+          <p><i class="fas fa-file-upload"></i> Drop or select STIX 2.x file</p>
+          <label for="files" class="file-upload-label">
+            <i class="fas fa-file-alt"></i> Choose file
+            <input type="file" id="files" name="files" />
+          </label>
+          <div class="upload-zone" id="drop-zone">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Drop files here</p>
+          </div>
+        </div>
+
+        <div class="upload-method">
+          <p><i class="fas fa-link"></i> Fetch STIX 2.x from URL</p>
+          <div class="input-group">
+            <input type="text" id="url" name="url" placeholder="Enter URL here..." />
+            <button id="fetch-url"><i class="fas fa-download"></i> Fetch</button>
+          </div>
+          <div class="url-example">
+            <p>Example:</p>
+            <a href="https://raw.githubusercontent.com/oasis-open/cti-stix-visualization/master/test.json" target="_blank">
+              raw.githubusercontent.com/oasis-open/cti-stix-visualization/master/test.json
+            </a>
+          </div>
+        </div>
+
+        <div class="upload-method">
+          <p><i class="fas fa-paste"></i> Paste STIX 2.x JSON data</p>
+          <textarea id="paste-area-stix-json" name="pasted" placeholder="Copy/Paste JSON data here..."></textarea>
+          <button id="paste-parser"><i class="fas fa-check"></i> Parse</button>
+        </div>
+
+        <div class="upload-method">
+          <p><i class="fas fa-cog"></i> Custom Configuration (Optional)</p>
+          <textarea id="paste-area-custom-config" name="pasted" placeholder="Customize the graph display with JSON configuration..."></textarea>
+        </div>
+      </div>
     </div>
-    <div id="canvas-container" class="hidden">
+    
+    <!-- Floating Toolbar -->
+    <div class="floating-toolbar">
+      <!-- <div class="search-container"> -->
+        <!-- <i class="fas fa-search"></i> -->
+        <input type="" id="node-search" >
+      <!-- </div> -->
+      <button id="edit-selected-btn"><i class="fas fa-edit"></i> Edit Selected</button>
+      <button id="show-all-data-btn"><i class="fas fa-table"></i> Show Data</button>
+      <button id="export-btn"><i class="fas fa-file-export"></i> Export</button>
+      <button id="layout-btn"><i class="fas fa-project-diagram"></i> Re-Layout</button>
+      <button id="reset-view-btn"><i class="fas fa-undo"></i> Reset View</button>
+    </div>
+    
+    <!-- Main Canvas Container -->
+    <div id="canvas-container">
       <div id="canvas-wrapper">
         <div id="canvas"></div>
         <div id="timelineControls">
           <label for="timeline">Timeline</label>
           <input type="range" id="timeline" name="timeline" min="0" max="0" step="1" disabled/>
-          <label for="timelineCheckbox">Cumulative Timeline</label>
-          <input type="checkbox" id="timelineCheckbox" name="cumulative" checked disabled/>
+          <label for="timelineCheckbox">
+            <input type="checkbox" id="timelineCheckbox" name="cumulative" checked disabled/>
+            Cumulative
+          </label>
         </div>
-        <p>Drag the timeline selector to display objects according to their timestamp.</p>
-        <p>Dragging anywhere will pan the viewing area.</p>
-        <p>Use the mouse wheel to zoom.</p>
-        <p>Click the 'Selected Node' area to expand/shrink it.</p>
-        <p>Click legend items to toggle visibility of nodes of a particular STIX type.</p>
+        <div id="canvas-instructions">
+          <div><i class="fas fa-mouse-pointer"></i> Click nodes to select</div>
+          <div><i class="fas fa-hand-paper"></i> Drag to pan</div>
+          <div><i class="fas fa-search-plus"></i> Scroll to zoom</div>
+        </div>
       </div>
-      <div id="selected" class="sidebar">
-        <h2>Selected Node</h2>
-        <div id="selection"></div>
+    </div>
+    
+    <!-- Bottom Data Panel -->
+    <div id="bottom-panel" class="bottom-panel expanded">
+      <div class="bottom-panel-header">
+        <div class="tab-container">
+          <div class="tab active" data-tab="indicators"><i class="fas fa-shield-alt"></i> Indicators</div>
+          <div class="tab" data-tab="threat-actors"><i class="fas fa-user-secret"></i> Threat Actors</div>
+          <div class="tab" data-tab="malware"><i class="fas fa-bug"></i> Malware</div>
+          <div class="tab" data-tab="attack-patterns"><i class="fas fa-crosshairs"></i> Attack Patterns</div>
+          <div class="tab" data-tab="relationships"><i class="fas fa-link"></i> Relationships</div>
+          <div class="tab" data-tab="all"><i class="fas fa-th-list"></i> All Objects</div>
+          <div class="tab-controls">
+            <button id="toggle-view-mode" class="tab-control-btn" title="Toggle between data and details view"><i class="fas fa-info-circle"></i></button>
+            <button id="toggle-canvas-size" class="tab-control-btn" title="Toggle canvas size"><i class="fas fa-expand-alt"></i></button>
+          </div>
+        </div>
       </div>
-      <div id="connections" class="sidebar">
-        <h2>Linked Nodes</h2>
-        <h3>Incoming Edges:</h3>
-        <div id="connections-incoming"></div>
-        <h3>Outgoing Edges:</h3>
-        <div id="connections-outgoing"></div>
+      
+      <div class="bottom-panel-content">
+        <!-- Data view -->
+        <div id="data-view" class="view-mode active">
+          <div class="main-data-section">
+            <div id="indicators-tab" class="tab-content active">
+              <table id="indicators-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="indicators-body"></tbody>
+              </table>
+            </div>
+            
+            <div id="threat-actors-tab" class="tab-content">
+              <table id="threat-actors-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Identity Class</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="threat-actors-body"></tbody>
+              </table>
+            </div>
+            
+            <div id="malware-tab" class="tab-content">
+              <table id="malware-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Types</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="malware-body"></tbody>
+              </table>
+            </div>
+            
+            <div id="attack-patterns-tab" class="tab-content">
+              <table id="attack-patterns-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Kill Chain Phase</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="attack-patterns-body"></tbody>
+              </table>
+            </div>
+            
+            <div id="relationships-tab" class="tab-content">
+              <table id="relationships-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Relationship</th>
+                    <th>Target</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="relationships-body"></tbody>
+              </table>
+            </div>
+            
+            <div id="all-tab" class="tab-content">
+              <table id="all-objects-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>ID</th>
+                    <th>Name/Value</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="all-objects-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Details view -->
+        <div id="details-view" class="view-mode">
+          <div class="details-panels">
+            <!-- Selected Node Panel -->
+            <div id="selected" class="sidebar full-width">
+              <h2>
+                <i class="fas fa-info-circle"></i> Selected Node
+              </h2>
+              <div class="sidebar-content">
+                <div id="selection"></div>
+                <div id="node-edit-container" style="display: none;">
+                  <h3><i class="fas fa-pen"></i> Edit Node</h3>
+                  <textarea id="node-editor" class="json-editor"></textarea>
+                  <div class="edit-actions">
+                    <button id="save-node-btn"><i class="fas fa-save"></i> Save Changes</button>
+                    <button id="cancel-edit-btn" class="cancel"><i class="fas fa-times"></i> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Connections Panel -->
+            <div id="connections" class="sidebar full-width">
+              <h2>
+                <i class="fas fa-project-diagram"></i> Linked Nodes
+              </h2>
+              <div class="sidebar-content">
+                <h3><i class="fas fa-arrow-left"></i> Incoming Edges</h3>
+                <div id="connections-incoming"></div>
+                <h3><i class="fas fa-arrow-right"></i> Outgoing Edges</h3>
+                <div id="connections-outgoing"></div>
+              </div>
+            </div>
+            
+            <!-- Legend Panel -->
+            <div id="legend" class="sidebar full-width">
+              <h2>
+                <i class="fas fa-th-list"></i> Legend
+              </h2>
+              <div class="sidebar-content">
+                <table id="legend-content">
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="legend" class="sidebar">
-        <table id="legend-content">
-          <caption><h2>Legend</h2></caption>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit STIX Object</h2>
+        <div class="editor-wrapper">
+          <textarea id="json-editor" class="json-editor"></textarea>
+        </div>
+        <div class="edit-actions">
+          <button id="save-edit-btn"><i class="fas fa-save"></i> Save Changes</button>
+          <button id="cancel-modal-btn" class="cancel"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- IOC Summary Modal -->
+    <div id="ioc-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Indicators of Compromise (IOCs)</h2>
+        <div class="actions-bar">
+          <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="ioc-search" placeholder="Filter IOCs...">
+          </div>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="ip">IP Addresses</button>
+            <button class="filter-btn" data-filter="domain">Domains</button>
+            <button class="filter-btn" data-filter="url">URLs</button>
+            <button class="filter-btn" data-filter="hash">Hashes</button>
+          </div>
+        </div>
+        <table id="ioc-summary-table" class="indicator-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Pattern Type</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ioc-summary-body"></tbody>
         </table>
       </div>
     </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
   </body>
 </html>

@@ -1,0 +1,164 @@
+/* Horizontal Layout for Details Panels */
+#details-view {
+  width: 100%; 
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+.details-panels {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.details-panels .sidebar {
+  flex: 1;
+  border-left: 1px solid var(--gray-200);
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
+  border-top: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0; /* Important for flex layout */
+  width: 33.333%; /* Ensure exactly three equal columns */
+  max-width: 33.333%; /* Ensure equal distribution */
+}
+
+.details-panels .sidebar:first-child {
+  border-left: none;
+}
+
+.details-panels .sidebar h2 {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--primary-color);
+  border-radius: 0;
+  flex-shrink: 0;
+  font-size: 1rem;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.details-panels .sidebar-content {
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Improve appearance in horizontal layout */
+.details-panels #selection,
+.details-panels #legend-content {
+  width: 100%;
+}
+
+/* Special handling for linked nodes panel which contains both incoming and outgoing edges */
+#connections .sidebar-content {
+  display: flex;
+  flex-direction: column;
+}
+
+#connections-incoming, 
+#connections-outgoing {
+  width: 100%;
+  padding: 0 !important; /* Override any existing padding */
+}
+
+/* Make connection edges more readable */
+.details-panels .selected-object-text-value-ref {
+  word-break: break-word;
+}
+
+/* Limit width of text to prevent horizontal scrolling */
+.details-panels .selected-object-text-value,
+.details-panels .selected-object-nontext-value {
+  word-break: break-word;
+}
+
+/* Improve spacing in details panels */
+.details-panels #selection {
+  line-height: 1.6;
+}
+
+.details-panels h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Legend styling in details view */
+.details-panels #legend-content {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.details-panels #legend-content td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.details-panels #legend-content img {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  width: 20px;
+  height: 20px;
+}
+
+/* Ensure data view also takes full width */
+#data-view {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Active toggle button */
+.tab-control-btn.active {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+/* Main data section adjustments */
+#data-view .main-data-section {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Adjust tab content to fill available space */
+#data-view .tab-content {
+  height: 100%;
+  overflow: auto;
+}
+
+/* For small screens stack panels vertically */
+@media (max-width: 992px) {
+  .details-panels {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .details-panels .sidebar {
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .details-panels .sidebar:last-child {
+    border-bottom: none;
+  }
+} 
